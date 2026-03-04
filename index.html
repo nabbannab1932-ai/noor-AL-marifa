@@ -1,75 +1,13 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>نظام إدارة وتقييم الطلاب</title>
-<style>
-body {
-    font-family: Arial;
-    direction: rtl;
-    background: #f4f6f9;
-    margin: 0;
-}
-header {
-    background: #2a9d8f;
-    color: white;
-    padding: 15px;
-    text-align: center;
-}
-.container {
-    width: 95%;
-    margin: 20px auto;
-}
-.search-box {
-    margin: 15px 0;
-    text-align: center;
-}
-.search-box input {
-    width: 60%;
-    padding: 8px;
-    font-size: 16px;
-}
-.grade-box {
-    background: white;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 10px;
-    overflow-x: auto;
-}
-h2 {
-    background: #264653;
-    color: white;
-    padding: 8px;
-    border-radius: 5px;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-th, td {
-    border: 1px solid #ddd;
-    padding: 6px;
-    text-align: center;
-}
-th {
-    background: #e9c46a;
-}
-button {
-    padding: 6px 10px;
-    background: #e76f51;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 2px;
-}
-button:hover { background: #d35400; }
-.delete-btn { background: red; }
-</style>
+  <meta charset="UTF-8">
+  <title>نظام الطلاب</title>
 </head>
 
 <body>
+
+<h1>نظام تسجيل الطلاب</h1>
 
 <h2>إضافة طالب</h2>
 
@@ -82,135 +20,34 @@ button:hover { background: #d35400; }
 <h2>قائمة الطلاب</h2>
 <div id="students"></div>
 
-
-<header>
-    <h1>نظام إدارة وتقييم الطلاب</h1>
-    <button onclick="login()">🔒 دخول المدرس</button>
-</header>
-
-<div class="container">
-    <div class="search-box">
-        <input type="text" id="searchInput" placeholder="🔎 ابحث عن طالب..."
-               onkeyup="renderGrades()">
-    </div>
-    <div id="gradesContainer"></div>
-</div>
-
-<script>
-let teacherMode = false;
-let subjects = ["اسلامية","لغة عربية","لغة انجليزية","رياضيات","احياء","كيمياء","فيزياء"];
-
-// الطلاب الافتراضيين المضافين من الكود فقط
-let grades = {
-    "الأول المتوسط":[],
-    "الثاني المتوسط": [],
-    "الثالث المتوسط": [],
-    "الرابع الاعدادي": [],
-    "الخامس الاعدادي": [],
-    "السادس الاعدادي": []
-};
-
-// دالة تسجيل دخول المدرس
-function login() {
-    let password = prompt("ادخل كلمة سر المدرس:");
-    if (password === "1234") {
-        teacherMode = true;
-        alert("تم تسجيل الدخول كمدرس");
-        renderGrades();
-    } else { alert("كلمة السر غير صحيحة"); }
-}
-
-// دالة عرض الطلاب والدرجات
-function renderGrades() {
-    let container = document.getElementById("gradesContainer");
-    container.innerHTML = "";
-    let searchValue = document.getElementById("searchInput").value.toLowerCase();
-
-    for (let grade in grades) {
-
-        let filteredStudents = grades[grade].filter(student =>
-            student.name.toLowerCase().includes(searchValue)
-        );
-        if (filteredStudents.length === 0 && searchValue !== "") continue;
-
-        let box = document.createElement("div");
-        box.className = "grade-box";
-
-        let title = document.createElement("h2");
-        title.innerText = grade;
-        box.appendChild(title);
-
-        let table = document.createElement("table");
-
-        let headerRow = "<tr><th>اسم الطالب</th>";
-        subjects.forEach(sub => headerRow += "<th>"+sub+"</th>");
-        if (teacherMode) headerRow += "<th>حذف</th>";
-        headerRow += "</tr>";
-        table.innerHTML = headerRow;
-
-        filteredStudents.forEach((student) => {
-            let index = grades[grade].indexOf(student);
-            let row = "<tr>";
-            row += "<td>"+student.name+"</td>";
-
-            subjects.forEach(sub => {
-                if (teacherMode) {
-                    row += `<td><input type="number" value="${student.marks[sub] || 0}"
-                            onchange="updateMark('${grade}',${index},'${sub}',this.value)"></td>`;
-                } else {
-                    row += "<td>"+(student.marks[sub] || 0)+"</td>";
-                }
-            });
-
-            if (teacherMode) {
-                row += `<td><button class="delete-btn"
-                        onclick="deleteStudent('${grade}',${index})">🗑 حذف</button></td>`;
-            }
-
-            row += "</tr>";
-            table.innerHTML += row;
-        });
-
-        box.appendChild(table);
-        container.appendChild(box);
-    }
-}
-
-// دوال تعديل الدرجات وحذف الطالب
-function updateMark(grade, index, subject, value) {
-    grades[grade][index].marks[subject] = value;
-}
-function deleteStudent(grade, index) {
-    if (confirm("هل أنت متأكد من حذف الطالب؟")) {
-        grades[grade].splice(index, 1);
-        renderGrades();
-    }
-}
-
-// عرض الطلاب عند تحميل الصفحة
-renderGrades();
-</script>
-
+<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const supabaseUrl = " https://fmdrigcrvbmqxxgpsime.supabase.co ";
-const supabaseKey = " eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtZHJpZ2NydmJtcXh4Z3BzaW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDk4NTEsImV4cCI6MjA4ODE4NTg1MX0.qKTG15BuS6t0ig4x6rSHzuogoUcGRV7QMvT1vbo-TU8 ";
+const supabaseUrl = "https://fmdrigcrvbmqxxgpsime.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtZHJpZ2NydmJtcXh4Z3BzaW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDk4NTEsImV4cCI6MjA4ODE4NTg1MX0.qKTG15BuS6t0ig4x6rSHzuogoUcGRV7QMvT1vbo-TU8";
 
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 // إضافة طالب
 async function addStudent() {
+
   const name = document.getElementById("name").value;
   const score = document.getElementById("score").value;
+
+  if(name === "" || score === "") {
+    alert("يرجى ملء الحقول");
+    return;
+  }
 
   const { error } = await supabase
     .from('students')
     .insert([{ name: name, score: score }]);
 
   if (!error) {
-    alert("تمت الإضافة");
-    location.reload();
+    document.getElementById("name").value = "";
+    document.getElementById("score").value = "";
+    loadStudents();
   } else {
     alert("حدث خطأ");
     console.log(error);
@@ -218,24 +55,27 @@ async function addStudent() {
 }
 
 // عرض الطلاب
-async function getStudents() {
+async function loadStudents() {
+
   const { data, error } = await supabase
     .from('students')
-    .select('*');
+    .select('*')
+    .order('id', { ascending: true });
 
   if (!error) {
     let container = document.getElementById("students");
+    container.innerHTML = "";
+
     data.forEach(student => {
       container.innerHTML += 
-        <p>${student.name} - الدرجة: ${student.score}</p>;
+        `<p>${student.name} - الدرجة: ${student.score}</p>`;
     });
   }
 }
 
-window.onload = getStudents;
+window.onload = loadStudents;
+
 </script>
-
-
 
 </body>
 </html>
