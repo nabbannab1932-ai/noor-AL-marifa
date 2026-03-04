@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
@@ -71,6 +71,18 @@ button:hover { background: #d35400; }
 
 <body>
 
+<h2>إضافة طالب</h2>
+
+<input type="text" id="name" placeholder="اسم الطالب">
+<input type="number" id="score" placeholder="الدرجة">
+<button onclick="addStudent()">إضافة</button>
+
+<hr>
+
+<h2>قائمة الطلاب</h2>
+<div id="students"></div>
+
+
 <header>
     <h1>نظام إدارة وتقييم الطلاب</h1>
     <button onclick="login()">🔒 دخول المدرس</button>
@@ -90,16 +102,8 @@ let subjects = ["اسلامية","لغة عربية","لغة انجليزية","
 
 // الطلاب الافتراضيين المضافين من الكود فقط
 let grades = {
-    "الأول المتوسط": ["أحمد", "سارة", "ليلى"].map(name => {
-        let student = { name: name, marks: {} };
-        subjects.forEach(sub => student.marks[sub] = 0);
-        return student;
-    }),
-    "الثاني المتوسط": ["محمد", "نور"].map(name => {
-        let student = { name: name, marks: {} };
-        subjects.forEach(sub => student.marks[sub] = 0);
-        return student;
-    }),
+    "الأول المتوسط":[],
+    "الثاني المتوسط": [],
     "الثالث المتوسط": [],
     "الرابع الاعدادي": [],
     "الخامس الاعدادي": [],
@@ -186,6 +190,52 @@ function deleteStudent(grade, index) {
 // عرض الطلاب عند تحميل الصفحة
 renderGrades();
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const supabaseUrl = " https://fmdrigcrvbmqxxgpsime.supabase.co ";
+const supabaseKey = " eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtZHJpZ2NydmJtcXh4Z3BzaW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2MDk4NTEsImV4cCI6MjA4ODE4NTg1MX0.qKTG15BuS6t0ig4x6rSHzuogoUcGRV7QMvT1vbo-TU8 ";
+
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+// إضافة طالب
+async function addStudent() {
+  const name = document.getElementById("name").value;
+  const score = document.getElementById("score").value;
+
+  const { error } = await supabase
+    .from('students')
+    .insert([{ name: name, score: score }]);
+
+  if (!error) {
+    alert("تمت الإضافة");
+    location.reload();
+  } else {
+    alert("حدث خطأ");
+    console.log(error);
+  }
+}
+
+// عرض الطلاب
+async function getStudents() {
+  const { data, error } = await supabase
+    .from('students')
+    .select('*');
+
+  if (!error) {
+    let container = document.getElementById("students");
+    data.forEach(student => {
+      container.innerHTML += 
+        <p>${student.name} - الدرجة: ${student.score}</p>;
+    });
+  }
+}
+
+window.onload = getStudents;
+</script>
+
+
 
 </body>
 </html>
